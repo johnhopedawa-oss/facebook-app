@@ -1,23 +1,41 @@
-name: Simple CI/CD Pipeline
+name: CI/CD Pipeline
 
-# Trigger on push to main branch
+# Trigger the workflow on push to main branch or pull requests
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
+# Define the jobs to run
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
     
     steps:
-    # Download your code
+    # Checkout the code from repository
     - name: Checkout code
       uses: actions/checkout@v4
     
-    # Build the Docker image
-    - name: Build Docker image
-      run: docker build -t facebook-app:latest .
+    # Set up Docker Buildx for advanced building features
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
     
-    # Show that it worked
-    - name: List Docker images
-      run: docker images
+    # Login to Docker Hub (you'll need to set up secrets for this)
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    
+    # Build and push Docker image
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: |
+          ${{ secrets.DOCKER_USERNAME }}/facebook-app:latest
+          ${{ secrets.DOCKER_USERNAME }}/facebook-app:${{ github.sha }}
+        platforms: linux/amd64,linux/arm64
