@@ -1,0 +1,23 @@
+name: Simple CI/CD Pipeline
+
+# Trigger on push to main branch
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Download your code
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    # Build the Docker image
+    - name: Build Docker image
+      run: docker build -t facebook-app:latest .
+    
+    # Show that it worked
+    - name: List Docker images
+      run: docker images
