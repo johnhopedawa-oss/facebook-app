@@ -1,5 +1,10 @@
+require('dotenv').config();
+
 const express = require("express")
 const server = express()
+
+const DB_PASSWORD = process.env.DB_PASSWORD;
+const API_KEY = process.env.API_KEY;
 
 server.use(express.json());
 
